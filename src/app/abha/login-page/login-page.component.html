@@ -1,0 +1,205 @@
+<div *ngIf="isCreateView" class="full-height-center">
+  <div class="card shadow-lg rounded-4 card-custom d-flex align-items-center">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <!-- <div class="card-img-container mt-4">
+            <img src="assets/login-banner.png" alt="Sample" class="card-img-left img-fluid" />
+          </div> -->
+          <h4>What is an ABHA Card?</h4>
+          <p class="text-justify" style="text-align: justify;">The ABHA ID is a digital health card that allows seamless
+            access to medical services across India. By creating an ABHA card, individuals can securely store and share
+            their health records with healthcare providers, ensuring continuity of care. Doctors can use EMR software
+            integrated with the Ayushman Bharat Digital Mission (ABDM) to access and update patient records. The ABHA ID
+            creation process is simple and can be completed online through ABHA card registration. Patients benefit from
+            streamlined healthcare services, while doctors can leverage the Digital Health Incentive Scheme to digitise
+            their practices and enhance efficiency. Apply for an ABHA card today to unlock these benefits and
+            participate in India’s growing digital health ecosystem</p>
+        </div>
+
+        <div class="col-md-6 d-flex align-items-center justify-content-center p-2">
+          <div class="text-center">
+            <ng-container *ngIf="isCreateView">
+              <div class="container">
+                <div class="row">
+                  <div *ngIf="isLoginByMobile" class="col-12 container-animation">
+                    <h3 class="text-center mb-4">Create ABHA Account</h3>
+                    <form (submit)="onMobileSubmit()" #mobileForm="ngForm">
+                      <p class="small text-center">
+                        Issued by the National Health Authority through the Ayushman Bharat Digital Mission (ABDM)
+                      </p>
+
+                      <div class="input-group mb-3">
+                        <span class="input-group-text">
+                          <i class="bi bi-telephone"></i>
+                        </span>
+                        <input type="tel" class="form-control custom-input" placeholder="Enter Phone Number"
+                          name="mobile" [(ngModel)]="mobile" minlength="10" maxlength="10" pattern="[6-9][0-9]{9}"
+                          inputmode="numeric" required />
+                      </div>
+
+                      <div class="mb-3">
+                        <button *ngIf="!isLoading" class="btn btn-primary w-100" type="submit"
+                          [disabled]="mobileForm.invalid">
+                          Create / View your ABHA
+                        </button>
+                        <span *ngIf="isLoading" class="ring-spinner me-2" aria-hidden="true"></span>
+                      </div>
+
+                      <div class="text-center small text-muted my-3 ">────────── or ──────────</div>
+
+                      <div class="text-center small">
+                        Already have an existing ABHA account?<br />
+                        <a class="text-primary" (click)="switchToMobileOrAadhar()" style="cursor: pointer;">Log in using
+                          Aadhar number</a>
+                      </div>
+                    </form>
+                  </div>
+
+
+                  <div *ngIf="!isLoginByMobile" class="col-12 container-animation">
+                    <h3 class="text-center mb-4">Create ABHA Account</h3>
+                    <form (submit)="onAadhaarSubmit(getFullAadhaarNumber())" #aadhaarForm="ngForm">
+                      <p class="small text-center">
+                        Issued by the National Health Authority through the Ayushman Bharat Digital Mission (ABDM)
+                      </p>
+
+                      <div class="mb-3 d-flex gap-2">
+                        <input name="aadhaar1" ngModel minlength="4" maxlength="4" pattern="[0-9]*" inputmode="numeric"
+                          placeholder="9876" [(ngModel)]="aadharPart1" #part1Ref class="form-control text-center"
+                          required (input)="moveToNext($event, part2Ref)" (keydown)="moveToPrev($event, null)">
+
+                        <input name="aadhaar2" ngModel minlength="4" maxlength="4" pattern="[0-9]*" inputmode="numeric"
+                          placeholder="5432" [(ngModel)]="aadharPart2" #part2Ref class="form-control text-center"
+                          required (input)="moveToNext($event, part3Ref)" (keydown)="moveToPrev($event, part1Ref)">
+
+                        <input name="aadhaar3" ngModel minlength="4" maxlength="4" pattern="[0-9]*" inputmode="numeric"
+                          placeholder="1000" [(ngModel)]="aadharPart3" #part3Ref class="form-control text-center"
+                          required (keydown)="moveToPrev($event, part2Ref)">
+                      </div>
+
+                      <div class="mb-3">
+                        <button *ngIf="!isLoading" class="btn btn-primary w-100" type="submit"
+                          [disabled]="aadhaarForm.invalid || !isAadhaarComplete()">
+                          Create / View your ABHA
+                        </button>
+                        <span *ngIf="isLoading" class="ring-spinner me-2" aria-hidden="true"></span>
+                      </div>
+
+                      <div class="text-center small text-muted my-3 ">────────── or ──────────</div>
+
+                      <div class="text-center small">
+                        Already have an existing ABHA account?<br />
+                        <a class="text-primary" (click)="switchToMobileOrAadhar()" style="cursor: pointer;">Log in using
+                          mobile number</a>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div *ngIf="showOtp" class="full-height-center">
+  <div class="card shadow-lg rounded-4 p-4 otp-card text-center">
+    <div class="card-body">
+
+      <h2 class="fw-semibold mb-1">Confirm OTP</h2>
+      <p class="text-muted mb-4">{{ resOtpMsg }}</p>
+
+      <form [formGroup]="otpForm" (ngSubmit)="onOtpSubmit()" novalidate>
+
+        <!-- OTP Boxes -->
+        <div class="d-flex justify-content-center gap-2 mb-3">
+          <ng-container *ngFor="let i of [0,1,2,3,4,5]">
+            <input #box class="otp-box text-center fw-semibold" maxlength="1" inputmode="numeric" pattern="[0-9]*"
+              (input)="handleInput($event, i)" (keydown)="handleKeydown($event, i)"
+              [attr.autofocus]="i === 0 ? true : null" />
+          </ng-container>
+        </div>
+
+        <!-- Resend Section -->
+        <div class="small mb-4">
+          Didn’t receive OTP?
+          <span *ngIf="countdown === 0">
+            <a href="#" (click)="resendOtp($event)" class="text-danger fw-semibold">Resend</a>
+          </span>
+          <span *ngIf="countdown > 0" class="ms-1">({{ countdown }}s)</span>
+        </div>
+
+        <!-- Hidden OTP Control -->
+        <input type="hidden" formControlName="otp" />
+
+        <!-- Mobile Input -->
+        <h6 *ngIf="!isLoginByMobile" class="fw-semibold mb-3 mt-2">Add mobile number you want to link with ABHA</h6>
+        <div *ngIf="!isLoginByMobile" class="input-group mb-3">
+          <span class="input-group-text">
+            <i class="bi bi-telephone"></i>
+          </span>
+          <input type="tel" class="form-control custom-input" formControlName="phone" placeholder="Enter Phone Number"
+            maxlength="10" pattern="[0-9]*" inputmode="numeric" />
+        </div>
+
+        <!-- Submit Button or Loader -->
+        <div *ngIf="!isLoading">
+          <button class="btn btn-primary custom-submit mt-2 mb-2" type="submit" [disabled]="otpForm.invalid">
+            Verify &amp; Continue
+          </button>
+        </div>
+        <div *ngIf="isLoading" class="mt-3 mb-2">
+          <span class="ring-spinner me-2" aria-hidden="true"></span>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- Create ABHA Address -->
+<div *ngIf="isCreateAbhaAddress" class="full-height-center position-relative">
+  <div class="card shadow-lg rounded-4 p-4 otp-card text-center" >
+    <div class="card-body">
+
+      <h2 class="fw-semibold mb-3">Create ABHA Address</h2>
+
+      <div class="mb-3">
+        <div class="input-group">
+          <input type="text" class="form-control"
+                 placeholder="Enter ABHA Address"
+                 [(ngModel)]="abhaAddress"
+                 (input)="onInputChange()" />
+          <span class="input-group-text">&#64;abdm</span>
+        </div>
+      
+        <!-- Inline Suggestions Below Input -->
+        <div class="d-flex mt-3 flex-wrap gap-2">
+          <button *ngFor="let suggestion of filteredSuggestions"
+                  class="btn btn-sm suggestion-chip btn-outline-secondary"
+                  type="button"
+                  (click)="selectSuggestion(suggestion)">
+            {{ suggestion }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Button / Spinner -->
+      <div *ngIf="!isLoading">
+        <button class="btn btn-primary custom-submit mt-2 mb-2" type="submit" (click)="createAbhaAddress()">
+          Create
+        </button>
+      </div>
+      <div *ngIf="isLoading" class="mt-3 mb-2">
+        <span class="ring-spinner me-2" aria-hidden="true"></span>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- /Create ABHA Address -->

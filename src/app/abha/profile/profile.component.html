@@ -1,0 +1,207 @@
+<div *ngIf="accountExits" class="d-flex justify-content-center align-items-center vh-100 overflow-hidden">
+    <div class="card border-0 p-4" style="width: 300px;">
+        <div class="row text-center success-wrap">
+            <div class="success-button mb-2">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h2>
+                Your ABHA ID already exists
+            </h2>
+            <p>
+                Kindly Download your latest ABHA card!!
+            </p>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="profileCard" class="container container-animation d-flex full-height-center">
+    <div class="card shadow-lg rounded-4 card-custom d-flex align-items-center">
+        <div class="card-body">
+            <div class="row">
+
+                <div class="col-md-6 d-flex align-items-center justify-content-center p-1">
+                    <div class="text-center">
+                        <div class="card profile-card">
+                            <div class="card-header profile-card-header p-0 ps-2 pe-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="left-icon">
+                                        <img src="assets/nha_logo.svg" alt="NHA" class="img-fluid card-header-img">
+                                    </div>
+                                    <div class="right-icon">
+                                        <img src="assets/abdm_logo.jpg" alt="ABHA"
+                                            class="img-fluid card-header-img rounded-circle">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <div class="row p-0">
+                                    <div class="col-3 col-md-3">
+                                        <img [src]="photoUrl" alt="Photo" class="img-fluid custom-photo">
+                                    </div>
+                                    <div class="col-6 col-md-6 text-start text-md-start details-font-size">
+                                        <label for=""><strong>Name:</strong></label><br>
+                                        {{name || "Pranav Subhash Sutar"}}<br>
+                                        <label for=""><strong>Abha Number:</strong></label><br>
+                                        {{abhaNumber || "123456789"}}<br>
+                                        <label for=""><strong>Abha Address:</strong></label><br>
+                                        {{abhaAddress || "123456789"}}
+                                    </div>
+                                    <div class="col-3 col-md-3">
+                                        <img [src]="qrCodeUrl" alt="QR Code" class="img-fluid custom-qr">
+                                    </div>
+                                </div>
+                                <div class="row p-0 mt-2 details-font-size">
+                                    <div class="col-4 text-start">
+                                        Gender:<br>
+                                        {{gender||"Male"}}
+                                    </div>
+                                    <div class="col-4">
+                                        DOB:<br>
+                                        {{dateOfBirth||"01-02-2003"}}
+                                    </div>
+                                    <div class="col-4 text-end">
+                                        Phone:<br>
+                                        {{mobile||"1234567890"}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 d-flex align-items-center justify-content-center p-1">
+                    <div *ngIf="otherDetails" class="update-box p-4 rounded-3 shadow-sm bg-light w-100">
+                        <h5 class="fw-semibold mb-3">Other Information</h5>
+
+                        <!-- Mobile Number -->
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                <div class="text-muted small">Mob. Linked to ABHA</div>
+                                <button class="btn btn-link p-0 text-decoration-none text-primary"
+                                    (click)="selectMobileUpdate()">
+                                    <i class="bi bi-pencil-square me-1"></i>Edit Info
+                                </button>
+                            </div>
+                            <div class="fw-semibold">{{ maskDetails(mobile,0,4) || '9748268628' }}</div>
+                        </div>
+
+                        <!-- ABHA Address -->
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                <div class="text-muted small">ABHA Address</div>
+                                <button class="btn btn-link p-0 text-decoration-none text-info">
+                                    <i class="bi bi-info-circle me-1"></i>View Info
+                                </button>
+                            </div>
+                            <div class="fw-semibold">{{ maskDetails(abhaAddress,2,5) || maskDetails("demo@abdm")}}</div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                                <div class="text-muted small">Email Linked to ABHA</div>
+                                <button class="btn btn-link p-0 text-decoration-none text-danger">
+                                    <i class="bi bi-plus-circle me-1"></i>Add Info
+                                </button>
+                            </div>
+                            <div class="fw-semibold">{{email||"----"}}</div>
+                        </div>
+
+                        <!-- Delete ABHA -->
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                                <div class="text-muted small">Delete ABHA</div>
+                                <button class="btn btn-link p-0 text-decoration-none text-danger"
+                                    (click)="selectDeleteAbha()">
+                                    <i class="bi bi-trash me-1"></i>Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Update Mobile Number Starts-->
+                    <div *ngIf="isUpdateMobile" class="update-box p-4 rounded-3 shadow-sm bg-light w-100 text-center">
+                        <h5 class="fw-semibold mb-3">Update Mobile Number</h5>
+                        <form #form="ngForm">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">
+                                    <i class="bi bi-telephone"></i>
+                                </span>
+                                <input type="tel" class="form-control custom-input" placeholder="Enter Phone Number"
+                                    name="updatedMobileNumber" [(ngModel)]="updatedMobileNumber" minlength="10"
+                                    maxlength="10" #mobileValidation="ngModel" pattern="[6-9][0-9]{9}"
+                                    inputmode="numeric" required />
+                            </div>
+                            <div *ngIf="!isUpdateLoading">
+                                <button type="button" class="btn btn-primary custom-submit mt-2 mb-2" type="submit"
+                                    (click)="updateMobileNumber()" [disabled]="mobileValidation.invalid">
+                                    Verify &amp; Continue
+                                </button>
+                            </div>
+                            <div *ngIf="isUpdateLoading" class="mt-3 mb-2">
+                                <span class="ring-spinner me-2" aria-hidden="true"></span>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- Update Mobile Number Ends -->
+
+                    <!-- Delete ABHA Starts -->
+                    <!-- <div *ngIf="isDeleteABHA" class="update-box p-4 rounded-3 shadow-sm bg-light w-100 text-center">
+                        <h5 class="fw-semibold mb-3">Delete ABHA</h5>
+                        
+                    </div> -->
+                    <!-- Delete ABHA Ends -->
+
+                    <!-- OTP Verification For Update Starts -->
+                    <div *ngIf="isShowOtp" class="update-box p-4 rounded-3 shadow-sm bg-light w-100 text-center">
+                        <h5 class="fw-semibold mb-3">OTP Verification</h5>
+                        <p>{{resOtpMsg}}</p>
+                        <form [formGroup]="otpForm" (ngSubmit)="verifyUpdateMobileNumber()" novalidate>
+                            <div class="d-flex justify-content-center gap-2 mb-3">
+                                <ng-container *ngFor="let i of [0,1,2,3,4,5]">
+                                    <input #box class="otp-box text-center fw-semibold" maxlength="1"
+                                        inputmode="numeric" pattern="[0-9]*" (input)="handleInput($event, i)"
+                                        (keydown)="handleKeydown($event, i)" [attr.autofocus]="i === 0 ? true : null" />
+                                </ng-container>
+                            </div>
+
+                            <div class="small mb-4">
+                                Didn’t receive OTP?
+                                <span *ngIf="countdown === 0">
+                                    <a href="#" (click)="resendOtp($event)" class="text-danger fw-semibold">Resend</a>
+                                </span>
+                                <span *ngIf="countdown > 0" class="ms-1">({{ countdown }}s)</span>
+                            </div>
+
+                            <input type="hidden" formControlName="otp" />
+
+                            <div *ngIf="!isUpdateLoading">
+                                <button class="btn btn-primary custom-submit mt-2 mb-2" type="submit"
+                                    [disabled]="otpForm.invalid">
+                                    Verify &amp; Submit
+                                </button>
+                            </div>
+                            <div *ngIf="isUpdateLoading" class="mt-3 mb-2">
+                                <span class="ring-spinner me-2" aria-hidden="true"></span>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- OTP Verification For Update Ends -->
+                </div>
+
+                <div class="row text-center">
+                    <div class="col-12">
+                        <div *ngIf="profileCard" class="row text-center mt-3">
+                            <div *ngIf="!isLoading" class="col-12">
+                                <button class="btn btn-info" (click)="downloadFile()">Download</button>
+                            </div>
+                            <div *ngIf="isLoading" class="mt-3 mb-2">
+                                <span class="ring-spinner me-2" aria-hidden="true"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
