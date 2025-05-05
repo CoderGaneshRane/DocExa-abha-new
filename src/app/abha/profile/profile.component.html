@@ -101,7 +101,7 @@
                         <div class="mb-2">
                             <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
                                 <div class="text-muted small">Email Linked to ABHA</div>
-                                <button class="btn btn-link p-0 text-decoration-none text-danger">
+                                <button class="btn btn-link p-0 text-decoration-none text-danger" (click)="selectEmailUpdate()">
                                     <i class="bi bi-plus-circle me-1"></i>Add Info
                                 </button>
                             </div>
@@ -145,6 +145,39 @@
                         </form>
                     </div>
                     <!-- Update Mobile Number Ends -->
+
+                    <!-- Update Email Starts -->
+                    <div *ngIf="isUpdateEmail" class="update-box p-4 rounded-3 shadow-sm bg-light w-100 text-center">
+                        <h5 class="fw-semibold mb-3">Update Email</h5>
+                        <form #form="ngForm">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                <input
+                                    type="email"
+                                    class="form-control custom-input"
+                                    placeholder="Enter Email Address"
+                                    name="updatedEmail"
+                                    [(ngModel)]="email"
+                                    #emailValidation="ngModel"
+                                    pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                    required
+                                />
+                            </div>
+
+                            <div *ngIf="!isUpdateLoading">
+                                <button type="button" class="btn btn-primary custom-submit mt-2 mb-2" type="submit"
+                                    (click)="updateEmailOtpRequest()" [disabled]="emailValidation.invalid">
+                                    Verify &amp; Continue
+                                </button>
+                            </div>
+                            <div *ngIf="isUpdateLoading" class="mt-3 mb-2">
+                                <span class="ring-spinner me-2" aria-hidden="true"></span>
+                            </div>
+                        </form>
+                    </div>
+                    <!--Update Email Ends  -->
 
                     <!-- Delete ABHA Starts -->
                     <!-- <div *ngIf="isDeleteABHA" class="update-box p-4 rounded-3 shadow-sm bg-light w-100 text-center">

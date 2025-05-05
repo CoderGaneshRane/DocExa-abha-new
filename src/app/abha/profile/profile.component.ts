@@ -4,6 +4,7 @@ import { AbhaServicesService } from '../services/abha-services.service';
 import { interval, map, Subscription, take } from 'rxjs';
 import { jsPDF } from "jspdf";
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-profile',
@@ -42,12 +43,14 @@ export class ProfileComponent implements OnInit {
   email:any;
   otherDetails:any
   isUpdateMobile:boolean=false;
+  isUpdateEmail:boolean=false;
   isDeleteABHA : boolean = false;
   updatedMobileNumber:any;
   transactionId:any
   constructor(private fb: FormBuilder,
     private service:AbhaServicesService,
-    private route:Router
+    private route:Router,
+    private toastr:ToastrService
   ) {
     this.uniqueToken = localStorage.getItem('token');
     this.getQrCode();
@@ -162,6 +165,10 @@ export class ProfileComponent implements OnInit {
     this.isUpdateMobile = true;
     this.updatedMobileNumber = this.mobile;
   }
+  selectEmailUpdate(){
+    this.otherDetails = false;
+    this.isUpdateEmail = true;
+  }
   selectDeleteAbha(){
     this.isDeleteABHA = true;
     let data = {
@@ -203,7 +210,7 @@ export class ProfileComponent implements OnInit {
       error: (err) => {
         switch (err.status) {
           case 400:
-            alert("Invalid Credentials!!");
+            this.toastr.warning('Invalid Credentials!!')
             this.isUpdateLoading = false;
             break;
         }
@@ -236,11 +243,10 @@ export class ProfileComponent implements OnInit {
             this.isUpdateLoading = false;
             this.transactionId = res.Response.txnId;
             this.isShowOtp = false;
+            this.getAccountDetails();
             this.otpForm.reset();
             this.otherDetails = true;
-            this.getAccountDetails();
           }
-          
         }
       })
     }
@@ -257,7 +263,7 @@ export class ProfileComponent implements OnInit {
     this.service.deleteAbhaVerify(data).subscribe({
       next: (res:any)=>{
         if(res.status==200){
-          alert("Account Deleted Successfully!!");
+          this.toastr.success('Account Deleted Successfully!!')
           this.route.navigate(["/"]);
           localStorage.clear();
         }
@@ -265,7 +271,63 @@ export class ProfileComponent implements OnInit {
       error:(err)=>{
         switch(err.status){
           case 400:
-            alert("Invalid Creadentials");
+            this.toastr.warning('Invalid Creadentials')
+            break;
+        }
+      }
+    })
+  }
+  updateEmailOtpRequest(){
+    this.isUpdateLoading = true;
+    let data = {
+      "email":this.email,
+      "token":this.uniqueToken
+    }
+    this.service.updateEmailOtpRequest(data).subscribe({
+      next: (res:any)=>{
+        console.log("Email OTP Request : ",res);
+        if(res.status == 200){
+          this.isUpdateLoading = false;
+          this.resOtpMsg = res.Response.message;
+          this.transactionId = res.Response.txnId;
+          this.isUpdateEmail = false;
+          this.isShowOtp = true;
+          this.startOtpTimer();
+        }
+      },
+      error:(err:any) => {
+        switch(err.status){
+          case 400:
+            this.toastr.warning('Invalid Credentials!!')
+            this.isUpdateLoading = false;
+            break;
+        }
+      }
+    })
+  }
+  updateEmailVerifyOtp(){
+    this.isUpdateLoading = true;
+    let data = {
+      "txnId":this.transactionId,
+      "otp":this.otpForm.get('otp')?.value,
+      "token":this.uniqueToken
+    }
+
+    this.service.updateEmailVerifyOtp(data).subscribe({
+      next:(res:any)=>{
+        console.log(res);
+        if(res.status==200){
+          this.isShowOtp = false;
+          this.getAccountDetails();
+          this.isUpdateLoading = false;
+          this.otherDetails = true;
+        }
+      },
+      error:(err:any)=>{
+        switch(err.status){
+          case 400:
+            this.toastr.warning('Invalid Credentials!!')
+            this.isUpdateLoading = false;
             break;
         }
       }

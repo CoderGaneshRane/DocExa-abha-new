@@ -3,6 +3,8 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { AbhaServicesService } from '../services/abha-services.service';
 import { interval, map, Subscription, take } from 'rxjs';
 import { Router, RouterModule } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+
 
 @Component({
   selector: 'app-login-page',
@@ -47,7 +49,8 @@ filteredSuggestions: string[] = [];
 
   constructor(private fb: FormBuilder,
     private service: AbhaServicesService,
-    private route: Router
+    private route: Router,
+    private toastr: ToastrService
   ) { 
     this.filteredSuggestions = [...this.suggestions]
   }
@@ -105,22 +108,23 @@ filteredSuggestions: string[] = [];
       error: (err)=>{
         switch (err.status) {
           case 422:
-            alert("Something went Wrong!!");
+            this.toastr.warning('Something went Wrong!!')
             break;
           case 429:
-            alert("Please try after some time!!");
+            this.toastr.warning('Please try after some time!!')
             break;
           case 400:
-            alert("Invalid Mobile Number");
+            this.toastr.warning('Invalid Mobile Number')
             break;
           case 401:
-            alert("Invalid Credentials"); 
+            this.toastr.warning('Invalid Credentials')
             break;  
         }
       }
     })
   }
   onAadhaarSubmit(aNumber: any) {
+    this.toastr.success('','OTP sent !!');
     this.isLoading = true;
     console.log(aNumber);
     this.aadharNumber = aNumber;
@@ -145,25 +149,31 @@ filteredSuggestions: string[] = [];
 
         switch (err.status) {
           case 422:
-            alert("Something went Wrong!!");
+            this.toastr.warning('something went wrong!!')
             break;
           case 429:
-            alert("Please try after some time!!");
+            this.toastr.warning('Please try after some time!!')
             break;
           case 404:
-            alert("Please enter valid Aadhar");
+            this.toastr.warning('Please enter valid Aadhar')
             break;
           case 400:
-            alert("Please enter valid Details");
+            this.toastr.warning('Please enter valid Details')
             this.aadharPart1='';
             this.aadharPart2='';
             this.aadharPart3=''; 
             break;
           case 401:
-            alert("Please enter valid Details");
+            this.toastr.warning('Please enter valid Details')
             this.aadharPart1='';
             this.aadharPart2='';
             this.aadharPart3='';  
+            break;  
+          case 500:
+            this.toastr.warning('Something went wrong please try after sometime !!');
+            this.aadharPart1='';
+            this.aadharPart2='';
+            this.aadharPart3=''; 
             break;  
         }
       }
@@ -230,13 +240,13 @@ filteredSuggestions: string[] = [];
             console.error("Error Occured : ", err)
             switch (err.status) {
               case 422:
-                alert("Please Enter Valid OTP!!");
+                this.toastr.warning('Please Enter Valid OTP!!')
                 break;
               case 429:
-                alert("Please try after some time!!");
+                this.toastr.warning('Please try after some time!!')
                 break;
               case 404:
-                alert("Please enter valid Aadhar");
+                this.toastr.warning('Please enter valid Aadhar')
                 break;
             }
           }
@@ -264,10 +274,10 @@ filteredSuggestions: string[] = [];
       error: (err)=>{
         switch(err.status){
           case 404:
-            alert("Please Enter Valid Mobile Number");
+            this.toastr.warning('Please Enter Valid Mobile Number')
             break;
           case 422:
-            alert("Something Went Wrong!!");
+            this.toastr.warning('Something Went Wrong!!')
             break;  
         }
       }
@@ -288,28 +298,28 @@ filteredSuggestions: string[] = [];
       error:(err)=>{
         switch (err.status) {
           case 422:
-            alert("Something went Wrong!!");
+            this.toastr.warning('Something went Wrong!!')
             break;
           case 429:
-            alert("Please try after some time!!");
+            this.toastr.warning('Please try after some time!!')
             this.aadharPart1='';
             this.aadharPart2='';
             this.aadharPart3='';
             break;
           case 404:
-            alert("Please enter valid Aadhar");
+            this.toastr.warning('Please enter valid Aadhar')
             this.aadharPart1='';
             this.aadharPart2='';
             this.aadharPart3='';
             break;
           case 400:
-            alert("Please enter valid Details");
+            this.toastr.warning('Please enter valid Details')
             this.aadharPart1='';
             this.aadharPart2='';
             this.aadharPart3=''; 
             break;
           case 401:
-            alert("Please enter valid Details");
+            this.toastr.warning('Please enter valid Details')
             this.aadharPart1='';
             this.aadharPart2='';
             this.aadharPart3='';  
@@ -317,8 +327,6 @@ filteredSuggestions: string[] = [];
         }
       }
     })
-    
-    console.log('Resend OTP');
   }
 
   private startOtpTimer(): void {
@@ -344,7 +352,7 @@ filteredSuggestions: string[] = [];
     this.service.getAbhaAddressSuggestions(this.transactionId).subscribe({
       next: (res:any) => {
         if(res.status==200){
-          console.log(res);
+          // console.log(res);
           this.suggestions = res.Response.abhaAddressList;
           this.filteredSuggestions = [...this.suggestions];
         }
@@ -369,13 +377,13 @@ filteredSuggestions: string[] = [];
     }
     this.service.createNewAbhaAddress(data).subscribe({
       next: (res) => {
-        console.log(res);
+        // console.log(res);
         this.route.navigate(['/profile']);
       },
       error: (err) => {
         switch(err.status){
           case 400:
-            alert("Invalid Credentials!!");
+            this.toastr.warning('Invalid Credentials!!')
             this.isLoading = false;
             break;
         }

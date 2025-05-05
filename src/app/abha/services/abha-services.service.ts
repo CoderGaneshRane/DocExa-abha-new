@@ -62,5 +62,11 @@ export class AbhaServicesService {
   deleteAbhaVerify(data:any):Observable<any>{
     return this.http.post(this.apiUrl+'profile/account/delete/verify/otp', data);
   }
+  updateEmailOtpRequest(data:any):Observable<any>{
+    return this.http.post(this.apiUrl+'profile/account/update-email/request/otp', data);
+  }
+  updateEmailVerifyOtp(data:any):Observable<any>{
+    return this.http.post(this.apiUrl+'profile/account/update-email/verify/otp', data);
+  }
 }
 
